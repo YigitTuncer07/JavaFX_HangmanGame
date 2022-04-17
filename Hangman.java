@@ -19,7 +19,7 @@ public class Hangman extends Application {
     private static final Pane pane = new Pane();
 
     private static final TextField textArea = new TextField();
-    private static final String[] wordPool = {"car", "money", "tattoo","apple","house","programming","turkey"};
+    private static final String[] wordPool = {"car", "money", "tattoo","apple","house","programming","turkey","blue whale","red lobster","coca cola","bayern munich"};
     private static String word = chooseWord();
     private static char[] wordArray = stringToChar(word);
     private static final Label displayLabel = new Label("Enter a letter or a word.");
@@ -302,6 +302,19 @@ public class Hangman extends Application {
     }
 
     private static String stringForLabel() {
+        int numOfSpaces = 0;
+        for (int i = 0; i < word.length(); i++){
+            if (word.charAt(i) == ' '){
+                numOfSpaces++;
+            }
+        }
+        int[] indexes = new int[numOfSpaces];
+        for (int i = 0, k = 0; i < word.length(); i++){
+            if (word.charAt(i) == ' '){
+                indexes[k] = i * 2;
+                k++;
+            }
+        }
         char[] array = new char[word.length() * 2 - 1];
         for (int i = 0; i < word.length() * 2 - 1; i++) {
             if (i % 2 == 0) {
@@ -310,7 +323,10 @@ public class Hangman extends Application {
                 array[i] = ' ';
             }
         }
-
+        for (int index : indexes) {
+            System.out.println(index);
+            array[index] = ' ';
+        }
         return String.valueOf(array);
     }
 
@@ -361,7 +377,6 @@ public class Hangman extends Application {
         return string.replace("", " ").trim();
 
     }
-
     private static void addPart(int i) {
         switch (i) {
             case 0:
