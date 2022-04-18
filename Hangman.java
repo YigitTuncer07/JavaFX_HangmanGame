@@ -6,45 +6,42 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Arc;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.Shape;
+import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
 
 public class Hangman extends Application {
-    private static final Pane pane = new Pane();
 
-    private static final TextField textArea = new TextField();
-    private static final String[] wordPool = {"car", "money", "tattoo","apple","house","programming","turkey","blue whale","red lobster","coca cola","bayern munich"};
+    private static final Pane pane = new Pane();
+    private final TextField textArea = new TextField();
+    private static final String[] wordPool = {"car","bayern munich","turkey","blue whale","red lobster","house","money","hangman","coca cola","lean","eggs","water","fish","minecraft","capitalism","orange juice","turkish delight","dragon"};
     private static String word = chooseWord();
     private static char[] wordArray = stringToChar(word);
-    private static final Label displayLabel = new Label("Enter a letter or a word.");
-    private static final Label wordLabel = new Label(stringForLabel());
-    private static final Label triedLetters = new Label("Tried Letters: ");
+    private final Label displayLabel = new Label("Enter a letter or a word.");
+    private final Label wordLabel = new Label(stringForLabel());
+    private  final Label triedLetters = new Label("Tried Letters: ");
     private static int wrongAnswers = 0;
     private static final ArrayList<Shape> addedParts = new ArrayList<>();
     private static boolean isGameLost = false;
     private static boolean isGameWon = false;
     private static final ArrayList<Character> triedChars = new ArrayList<>();
-
-
+    
     private static final Circle headCircle = new Circle();
     private static final Line bodyLine = new Line();
     private static final Line rightArmLine = new Line();
     private static final Line leftArmLine = new Line();
     private static final Line rightLegLine = new Line();
     private static final Line leftLegLine = new Line();
-    private static final Line rightEye = new Line();
     private static final Line leftEye = new Line();
-    private static final Arc mouth = new Arc();
+    private static final Line rightEye = new Line();
+    private static final Arc sadMouth = new Arc();
+    private static final Arc happyMouth = new Arc();
 
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage tryTextButtonPressed) {
 
         //Creates a new Pane
         pane.setPadding(new Insets(10, 10, 10, 10));
@@ -85,18 +82,21 @@ public class Hangman extends Application {
                         }
                         if (!wordLabel.getText().contains("_")) {
                             displayLabel.setText("Correct! You Won!");
+                            if (addedParts.size() >= 1){
+                                addPart(10);
+                            }
                             isGameWon = true;
                             textArea.setText("Start a new game!");
                             textArea.setEditable(false);
                         }
                     } else {
-                        if (wrongAnswers == 5) {
+                        if (wrongAnswers == 8) {
                             displayLabel.setText("Wrong! You Lost!");
                             wordLabel.setText(addSpacesToString(word));
                             textArea.setText("Start a new game!");
                             textArea.setEditable(false);
                             isGameLost = true;
-                            addPart(5);
+                            addPart(8);
                         } else {
                             displayLabel.setText("Wrong! Try again.");
                             addLetterToTriedLetters(inputChar);
@@ -109,18 +109,21 @@ public class Hangman extends Application {
                 } else if (input.length() > 1) {
                     if (input.equals(word)) {
                         displayLabel.setText("Correct! You Won!");
+                        if (addedParts.size() >= 1){
+                            addPart(10);
+                        }
                         isGameWon = true;
                         textArea.setText("Start a new game!");
                         textArea.setEditable(false);
                         wordLabel.setText(addSpacesToString(word));
                     } else {
-                        if (wrongAnswers == 5) {
+                        if (wrongAnswers == 8) {
                             displayLabel.setText("Wrong! You Lost!");
                             wordLabel.setText(addSpacesToString(word));
                             textArea.setText("Start a new game!");
                             textArea.setEditable(false);
                             isGameLost = true;
-                            addPart(5);
+                            addPart(8);
                         } else {
                             displayLabel.setText("Wrong! Try again!");
                             textArea.clear();
@@ -160,10 +163,10 @@ public class Hangman extends Application {
             for (Shape addedPart : addedParts) {
                 pane.getChildren().remove(addedPart);
             }
+            addedParts.clear();
 
         });
-
-        //These shapes don't change
+        tryTextButton.setDefaultButton(true);
 
         triedLetters.setLayoutX(252);
         triedLetters.setLayoutY(80);
@@ -181,6 +184,8 @@ public class Hangman extends Application {
         textArea.setLayoutX(252);
         textArea.setLayoutY(256);
         textArea.setPrefSize(244, 42);
+        textArea.setStyle("-fx-background-color: #EEEEEE;");
+        textArea.setPromptText("Enter text here");
         pane.getChildren().add(textArea);
 
         Line SplitLine = new Line();
@@ -268,24 +273,57 @@ public class Hangman extends Application {
         leftLegLine.setEndX(90);
         leftLegLine.setStroke(Color.GRAY);
 
-//        leftEye.setStartY(190);
-//        leftEye.setStartX(110);
-//        leftEye.setEndY(250);
-//        leftEye.setEndX(90);
-//        leftEye.setStroke(Color.GRAY);
+        leftEye.setStartY(62);
+        leftEye.setStartX(102);
+        leftEye.setEndY(70);
+        leftEye.setEndX(102);
+        leftEye.setStroke(Color.GRAY);
+
+        rightEye.setStartY(62);
+        rightEye.setStartX(118);
+        rightEye.setEndY(70);
+        rightEye.setEndX(118);
+        rightEye.setStroke(Color.GRAY);
+
+        sadMouth.setCenterX(110);
+        sadMouth.setCenterY(82);
+        sadMouth.setType(ArcType.OPEN);
+        sadMouth.setStartAngle(0);
+        sadMouth.setRadiusX(8);
+        sadMouth.setRadiusY(8);
+        sadMouth.setLength(180);
+        sadMouth.setFill(Color.TRANSPARENT);
+        sadMouth.setStroke(Color.GRAY);
+        sadMouth.setStrokeWidth(1);
+
+        happyMouth.setCenterX(110);
+        happyMouth.setCenterY(76);
+        happyMouth.setType(ArcType.OPEN);
+        happyMouth.setStartAngle(0);
+        happyMouth.setRadiusX(8);
+        happyMouth.setRadiusY(8);
+        happyMouth.setLength(-180);
+        happyMouth.setFill(Color.TRANSPARENT);
+        happyMouth.setStroke(Color.GRAY);
+        happyMouth.setStrokeWidth(1);
+
 
         //Creates scene and adds pane to it
         Scene scene = new Scene(pane, 498, 300);
+        pane.setStyle("-fx-background-color: #CCCCCC;");
         scene.getStylesheets().add("Hangman.css");
 
 
         //Sets up stage
-        stage.setResizable(false);
-        stage.setTitle("Hangman");
-        stage.setScene(scene);
-        stage.show();
+        tryTextButtonPressed.setResizable(false);
+        tryTextButtonPressed.setTitle("Hangman Beta 1.1v");
+        tryTextButtonPressed.setScene(scene);
+        tryTextButtonPressed.show();
 
+    }
 
+    public static void main(String[] args) {
+        launch();
     }
 
     public static String chooseWord() {
@@ -324,17 +362,16 @@ public class Hangman extends Application {
             }
         }
         for (int index : indexes) {
-            System.out.println(index);
             array[index] = ' ';
         }
         return String.valueOf(array);
     }
 
-    private static String replaceChar(int index, String replacement, String string) {
+    private String replaceChar(int index, String replacement, String string) {
         if (index == 0) {
             return replacement + string.substring(1);
 
-        } else if (index == wordLabel.getText().length() - 1) {
+        } else if (index == this.wordLabel.getText().length() - 1) {
             return string.substring(0, wordLabel.getText().length() - 1) + replacement;
 
         }
@@ -352,7 +389,7 @@ public class Hangman extends Application {
         }
         return false;
     }
-    private static void addLetterToTriedLetters(char c){
+    private void addLetterToTriedLetters(char c){
         if ((!triedChars.contains(c))){
             if (triedLetters.getText().length() == 15){
                 triedLetters.setText(triedLetters.getText() + c);
@@ -403,15 +440,35 @@ public class Hangman extends Application {
                 pane.getChildren().add(leftLegLine);
                 addedParts.add(leftLegLine);
                 break;
-            case 10:
-                pane.getChildren().addAll(rightEye,leftEye,mouth);
-                addedParts.add(rightEye);
+            case 6:
+                pane.getChildren().add(leftEye);
                 addedParts.add(leftEye);
-                addedParts.add(mouth);
                 break;
-
-
-
+            case 7:
+                pane.getChildren().add(rightEye);
+                addedParts.add(rightEye);
+                break;
+            case 8:
+                pane.getChildren().add(sadMouth);
+                addedParts.add(sadMouth);
+                break;
+            case 10:
+                int size = addedParts.size();
+                if (size <= 6){
+                    pane.getChildren().addAll(rightEye,leftEye,happyMouth);
+                    addedParts.add(rightEye);
+                    addedParts.add(leftEye);
+                    addedParts.add(happyMouth);
+                } else if (size == 7) {
+                    pane.getChildren().addAll(rightEye,happyMouth);
+                    addedParts.add(rightEye);
+                    addedParts.add(happyMouth);
+                } else if (size == 8){
+                    pane.getChildren().add(happyMouth);
+                    addedParts.add(happyMouth);
+                }
+                break;
         }
     }
 }
+
