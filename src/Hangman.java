@@ -10,14 +10,29 @@ import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Hangman extends Application {
 
     private static final Pane pane = new Pane();
     private final TextField textArea = new TextField();
-    private static final String[] wordPool = {"car","bayern munich","turkey","blue whale","red lobster","house","money","hangman","coca cola","lean","eggs","water","fish","minecraft","capitalism","orange juice","turkish delight","dragon"};
-    private static String word = chooseWord();
+
+    private static final File hangmanWords = new File("src/HangmanWords.txt");
+
+    private static final String[] wordPool = {"car","house","money"};
+    private static String word;
+
+    static {
+        try {
+            word = chooseWord(2);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     private static char[] wordArray = stringToChar(word);
     private final Label displayLabel = new Label("Enter a letter or a word.");
     private final Label wordLabel = new Label(stringForLabel());
@@ -29,9 +44,9 @@ public class Hangman extends Application {
     private static final ArrayList<Character> triedChars = new ArrayList<>();
     private int wins = 0;
     private int loses = 0;
-    private final Label winLabel = new Label("W: " + wins);
-    private final Label loseLabel = new Label("L: " + loses);
-    
+    private final Label winLabel = new Label("Wins: " + wins);
+    private final Label loseLabel = new Label("Loses: " + loses);
+
     private static final Circle headCircle = new Circle();
     private static final Line bodyLine = new Line();
     private static final Line rightArmLine = new Line();
@@ -43,15 +58,15 @@ public class Hangman extends Application {
     private static final Arc sadMouth = new Arc();
     private static final Arc happyMouth = new Arc();
 
+    public Hangman() {
+    }
+
 
     @Override
     public void start(Stage tryTextButtonPressed) {
 
         //Creates a new Pane
         pane.setPadding(new Insets(10, 10, 10, 10));
-
-        //Actual game
-
 
         //Creates nodes to add to pane
         Button tryTextButton = new Button("Try Text");
@@ -86,8 +101,10 @@ public class Hangman extends Application {
                         }
                         if (!wordLabel.getText().contains("_")) {
                             displayLabel.setText("Correct! You Won!");
+
                             wins++;
-                            winLabel.setText("W: " + wins);
+                            winLabel.setText("Wins: " + wins);
+
                             if (addedParts.size() >= 1){
                                 addPart(10);
                             }
@@ -99,7 +116,7 @@ public class Hangman extends Application {
                         if (wrongAnswers == 8) {
                             displayLabel.setText("Wrong! You Lost!");
                             loses++;
-                            loseLabel.setText("L: " + loses);
+                            loseLabel.setText("Loses: " + loses);
                             wordLabel.setText(addSpacesToString(word));
                             textArea.setText("Start a new game!");
                             textArea.setEditable(false);
@@ -118,7 +135,7 @@ public class Hangman extends Application {
                     if (input.equals(word)) {
                         displayLabel.setText("Correct! You Won!");
                         wins++;
-                        winLabel.setText("W: " + wins);
+                        winLabel.setText("Wins: " + wins);
                         if (addedParts.size() >= 1){
                             addPart(10);
                         }
@@ -130,7 +147,7 @@ public class Hangman extends Application {
                         if (wrongAnswers == 8) {
                             displayLabel.setText("Wrong! You Lost!");
                             loses++;
-                            loseLabel.setText("L: " + loses);
+                            loseLabel.setText("Loses: " + loses);
                             wordLabel.setText(addSpacesToString(word));
                             textArea.setText("Start a new game!");
                             textArea.setEditable(false);
@@ -149,12 +166,14 @@ public class Hangman extends Application {
             }
         });
 
-        Button clearTextButton = new Button("Clear Text");
+        Button clearTextButton = new Button("Show Stats");
         clearTextButton.setLayoutX(334);
         clearTextButton.setLayoutY(227);
         clearTextButton.setPrefWidth(80);
         pane.getChildren().add(clearTextButton);
-        clearTextButton.setOnAction(event -> textArea.clear());
+        clearTextButton.setOnAction(event -> {
+
+        });
 
         Button newGameButton = new Button("New Game");
         newGameButton.setLayoutX(416);
@@ -164,7 +183,11 @@ public class Hangman extends Application {
         newGameButton.setOnAction(event -> {
             triedLetters.setText("Tried Letters: ");
             wrongAnswers = 0;
-            word = chooseWord();
+            try {
+                word = chooseWord(2);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
             triedChars.clear();
             wordLabel.setText(stringForLabel());
             textArea.setEditable(true);
@@ -180,12 +203,14 @@ public class Hangman extends Application {
         });
         tryTextButton.setDefaultButton(true);
 
+
+
         winLabel.setLayoutX(252);
-        winLabel.setLayoutY(55);
+        winLabel.setLayoutY(110);
         pane.getChildren().add(winLabel);
 
-        loseLabel.setLayoutX(287);
-        loseLabel.setLayoutY(55);
+        loseLabel.setLayoutX(252);
+        loseLabel.setLayoutY(130);
         pane.getChildren().add(loseLabel);
 
         triedLetters.setLayoutX(252);
@@ -331,12 +356,10 @@ public class Hangman extends Application {
         //Creates scene and adds pane to it
         Scene scene = new Scene(pane, 498, 300);
         pane.setStyle("-fx-background-color: #CCCCCC;");
-        scene.getStylesheets().add("Hangman.css");
-
 
         //Sets up stage
         tryTextButtonPressed.setResizable(false);
-        tryTextButtonPressed.setTitle("Hangman Beta 1.1v");
+        tryTextButtonPressed.setTitle("Hangman 1.3v");
         tryTextButtonPressed.setScene(scene);
         tryTextButtonPressed.show();
 
@@ -346,9 +369,17 @@ public class Hangman extends Application {
         launch();
     }
 
-    public static String chooseWord() {
-        int index = (int) (Math.random() * wordPool.length);
-        return wordPool[index];
+    public static String chooseWord(int mode) throws FileNotFoundException {
+        switch (mode){
+            case 1:
+                int index = (int) (Math.random() * wordPool.length);
+                return wordPool[index];
+            case 2:
+                ArrayList<String> list = getWords();
+                int index1 = (int) (Math.random() * list.size());
+                return list.get(index1);
+        }
+        return "";
     }
 
     public static char[] stringToChar(String word) {
@@ -386,6 +417,7 @@ public class Hangman extends Application {
         }
         return String.valueOf(array);
     }
+
 
     private String replaceChar(int index, String replacement, String string) {
         if (index == 0) {
@@ -434,6 +466,17 @@ public class Hangman extends Application {
         return string.replace("", " ").trim();
 
     }
+
+    private static ArrayList<String> getWords() throws FileNotFoundException {
+        Scanner hangmanWordsScanner = new Scanner(hangmanWords);
+
+        ArrayList<String> list = new ArrayList<>();
+        while (hangmanWordsScanner.hasNext()){
+            list.add(hangmanWordsScanner.nextLine());
+        }
+        return list;
+    }
+
     private static void addPart(int i) {
         switch (i) {
             case 0:
